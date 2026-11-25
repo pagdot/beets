@@ -78,8 +78,8 @@ class ArtistInfo(TypedDict):
     artists: list[str]
     artist_credit: str
     artists_credit: list[str]
-    artist_id: str
-    artists_ids: list[str]
+    discogs_artistid: str
+    discogs_artistids: list[str]
     arrangers: list[str] | None
     composers: list[str] | None
     remixers: list[str] | None

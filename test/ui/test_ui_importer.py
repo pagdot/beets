@@ -43,6 +43,7 @@ class ImportSingletonTest(
             track_id=recording_id,
             length=1,
             index=0,
+            data_source="MusicBrainz",
         )
 
         with mock.patch(

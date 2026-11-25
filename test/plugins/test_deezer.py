@@ -74,7 +74,7 @@ class TestGetTrack:
         )
 
         assert track.artist == "Artist"
-        assert track.artist_id == "2"
+        assert track.deezer_artist_id == 2
 
     def test_falls_back_to_artist_without_contributors(self, plugin):
         track = plugin._get_track(
@@ -82,13 +82,13 @@ class TestGetTrack:
         )
 
         assert track.artist == "Artist"
-        assert track.artist_id == "2"
+        assert track.deezer_artist_id == 2
 
     def test_tolerates_missing_artist_and_contributors(self, plugin):
         track = plugin._get_track(self.track_data())
 
         assert track.artist is None
-        assert track.artist_id is None
+        assert track.deezer_artist_id is None
 
 
 class TestVariousArtistsDetection:

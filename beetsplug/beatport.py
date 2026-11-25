@@ -448,10 +448,9 @@ class BeatportPlugin(MetadataSourcePlugin):
 
         return AlbumInfo(
             album=release.name,
-            album_id=release.beatport_id,
             beatport_album_id=release.beatport_id,
             artist=artist,
-            artist_id=artist_id,
+            beatport_artist_id=artist_id,
             tracks=tracks,
             albumtype=release.category,
             va=va,
@@ -475,9 +474,9 @@ class BeatportPlugin(MetadataSourcePlugin):
         length = track.length.total_seconds()
         return TrackInfo(
             title=title,
-            track_id=track.beatport_id,
+            beatport_track_id=track.beatport_id,
             artist=artist,
-            artist_id=artist_id,
+            beatport_artist_id=artist_id,
             length=length,
             index=track.track_number,
             medium_index=track.track_number,

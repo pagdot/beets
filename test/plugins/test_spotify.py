@@ -158,7 +158,7 @@ class SpotifyPluginTest(PluginTestCase):
 
         track_info = self.spotify.track_for_id("6NPVjNh8Jhru9xOmyQigds")
         item = Item(
-            mb_trackid=track_info.track_id,
+            spotify_track_id=track_info.spotify_track_id,
             albumartist=track_info.artist,
             title=track_info.title,
             length=track_info.length,
@@ -262,24 +262,18 @@ class SpotifyPluginTest(PluginTestCase):
         assert album_info is not None
         assert album_info.artist == "Project Skylate, Sugar Shrill"
         assert album_info.artists == ["Project Skylate", "Sugar Shrill"]
-        assert album_info.artist_id == "6m8MRXIVKb6wQaPlBIDMr1"
-        assert album_info.artists_ids == [
-            "6m8MRXIVKb6wQaPlBIDMr1",
-            "4kkAIoQmNT5xEoNH5BuQLe",
-        ]
+        assert album_info.spotify_artist_id == "6m8MRXIVKb6wQaPlBIDMr1"
 
         assert len(album_info.tracks) == 1
         assert album_info.tracks[0].artist == "Foo, Bar"
         assert album_info.tracks[0].artists == ["Foo", "Bar"]
-        assert album_info.tracks[0].artist_id == "12345"
-        assert album_info.tracks[0].artists_ids == ["12345", "67890"]
+        assert album_info.tracks[0].spotify_artist_id == "12345"
 
         track_info = self.spotify.track_for_id("6sjZfVJworBX6TqyjkxIJ1")
         assert track_info is not None
         assert track_info.artist == "Foo, Bar"
         assert track_info.artists == ["Foo", "Bar"]
-        assert track_info.artist_id == "12345"
-        assert track_info.artists_ids == ["12345", "67890"]
+        assert track_info.spotify_artist_id == "12345"
 
     @responses.activate
     def test_get_track_details_by_id_chunks_requests(self):

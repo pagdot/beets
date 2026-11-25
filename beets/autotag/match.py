@@ -328,6 +328,19 @@ def _sort_candidates(candidates: Iterable[AnyMatch]) -> Sequence[AnyMatch]:
     return sorted(candidates, key=lambda match: match.distance)
 
 
+def _candidate_key(info: Info) -> Info.Identifier:
+    """Key a candidate in the results dictionary.
+
+    Providers that supply unique identifiers (like MusicBrainz) are
+    deduplicated by their ``(data_source, id)`` pair. Other providers
+    (#7164) key their candidates by content, so that multiple candidates
+    from the same source don't overwrite each other.
+    """
+    if info.id is not None:
+        return info.identifier
+    return (info.data_source, f"{info.artist} - {info.name}")
+
+
 def _add_candidate(
     source: Source, results: Candidates[AlbumMatch], info: AlbumInfo
 ) -> None:
@@ -337,7 +350,7 @@ def _add_candidate(
     duplicates, and calculating the distance.
     """
     log.debug(
-        "Candidate: {0.artist} - {0.album} ({0.album_id}) from {0.data_source}",
+        "Candidate: {0.artist} - {0.album} ({0.id}) from {0.data_source}",
         info,
     )
 
@@ -347,7 +360,7 @@ def _add_candidate(
         return
 
     # Prevent duplicates.
-    if info.album_id and info.identifier in results:
+    if _candidate_key(info) in results:
         log.debug("Duplicate.")
         return
 
@@ -375,7 +388,7 @@ def _add_candidate(
             return
 
     log.debug("Success. Distance: {}", dist)
-    results[info.identifier] = AlbumMatch(
+    results[_candidate_key(info)] = AlbumMatch(
         dist, info, dict(item_info_pairs), extra_items, extra_tracks
     )
 
@@ -481,7 +494,7 @@ def tag_item(
         log.debug("Searching for track IDs: {}", ", ".join(trackids))
         for info in metadata_plugins.tracks_for_ids(trackids):
             dist = track_distance(item, info, incl_artist=True)
-            candidates[info.identifier] = TrackMatch(dist, info, item)
+            candidates[_candidate_key(info)] = TrackMatch(dist, info, item)
 
         # If this is a good match, then don't keep searching.
         rec = _recommendation(_sort_candidates(candidates.values()))
@@ -506,7 +519,9 @@ def tag_item(
         item, search_artist, search_name
     ):
         dist = track_distance(item, track_info, incl_artist=True)
-        candidates[track_info.identifier] = TrackMatch(dist, track_info, item)
+        candidates[_candidate_key(track_info)] = TrackMatch(
+            dist, track_info, item
+        )
 
     # Sort by distance and return with recommendation.
     log.debug("Found {} candidates.", len(candidates))

@@ -219,18 +219,20 @@ class TestParsing(TidalPluginTest):
 
         assert info.raw_data == {
             "album": "My Album (Deluxe Edition)",
-            "album_id": "1",
+            # Generic (MusicBrainz) ID fields stay empty for non-MB sources
+            # (#7164); Tidal IDs live in the `tidal_*` fields.
+            "album_id": None,
             "albumdisambig": None,
             "albumstatus": None,
             "albumtype": "album",
             "albumtypes": ["album"],
             "artist": "Artist 1001",
             "artist_credit": None,
-            "artist_id": "1001",
+            "artist_id": None,
             "artist_sort": None,
             "artists": ["Artist 1001"],
             "artists_credit": None,
-            "artists_ids": ["1001"],
+            "artists_ids": None,
             "artists_sort": None,
             "asin": None,
             "barcode": "123456",
@@ -273,7 +275,7 @@ class TestParsing(TidalPluginTest):
                     "artist_sort": None,
                     "artists": ["Artist 1001"],
                     "artists_credit": None,
-                    "artists_ids": ["1001"],
+                    "artists_ids": None,
                     "artists_sort": None,
                     "bpm": None,
                     "composer_sort": None,
@@ -304,7 +306,7 @@ class TestParsing(TidalPluginTest):
                     "tidal_updated": CURRENT_TS,
                     "title": "Track One",
                     "track_alt": None,
-                    "track_id": "101",
+                    "track_id": None,
                     "work": None,
                     "work_disambig": None,
                 },
@@ -318,7 +320,7 @@ class TestParsing(TidalPluginTest):
                     "artist_sort": None,
                     "artists": ["Artist 1001"],
                     "artists_credit": None,
-                    "artists_ids": ["1001"],
+                    "artists_ids": None,
                     "artists_sort": None,
                     "bpm": None,
                     "composer_sort": None,
@@ -349,7 +351,7 @@ class TestParsing(TidalPluginTest):
                     "tidal_updated": CURRENT_TS,
                     "title": "Track Two (Remastered)",
                     "track_alt": None,
-                    "track_id": "102",
+                    "track_id": None,
                     "work": None,
                     "work_disambig": None,
                 },
@@ -434,7 +436,9 @@ class TestTrackParsing(TidalPluginTest):
         info = self.tidal._get_track_info(track, artist_lookup)
 
         assert info.title == "My Track"
-        assert info.track_id == "101"
+        # Generic (MusicBrainz) ID fields stay empty for non-MB sources;
+        # the Tidal ID lives in `tidal_track_id` (#7164).
+        assert info.track_id is None
         assert info.length == 240  # PT4M = 240 seconds
         assert info.isrc == "ISRC456"
         assert info.artist == "My Artist"
@@ -474,7 +478,8 @@ class TestTrackForID(TidalPluginTest):
 
         assert info is not None
         assert info.title == "API Track"
-        assert info.track_id == "490839595"
+        assert info.track_id is None
+        assert info.tidal_track_id == "490839595"
         assert info.artist == "API Artist"
 
     def test_track_for_id_not_found(self):
@@ -564,7 +569,8 @@ class TestAlbumForID(TidalPluginTest):
 
         assert info is not None
         assert info.album == "API Album"
-        assert info.album_id == "226495055"
+        assert info.album_id is None
+        assert info.tidal_album_id == "226495055"
         assert len(info.tracks) == 1
         assert info.tracks[0].title == "Album Track"
 

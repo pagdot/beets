@@ -804,6 +804,7 @@ class AutotagStub:
             artist_id="artistid",
             length=1,
             index=0,
+            data_source="MusicBrainz",
         )
 
     def _make_track_match(
@@ -842,7 +843,9 @@ class AutotagStub:
             album_id=f"albumid{id_}",
             artist_id=f"artistid{id_}",
             albumtype="soundtrack",
-            data_source="match_source",
+            # The stub simulates MusicBrainz results, so its generic
+            # identifiers are MusicBrainz IDs.
+            data_source="MusicBrainz",
             bandcamp_album_id="bc_url",
         )
 

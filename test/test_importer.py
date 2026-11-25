@@ -1544,7 +1544,11 @@ class TestImportDuplicateAlbumThreaded(PluginMixin, ImportHelper):
 
 def item_candidates_mock(*args, **kwargs):
     yield TrackInfo(
-        artist="artist", title="title", track_id="new trackid", index=0
+        artist="artist",
+        title="title",
+        track_id="new trackid",
+        index=0,
+        data_source="MusicBrainz",
     )
 
 
@@ -2443,7 +2447,7 @@ class ReimportTest(AutotagImportTestCase):
         self._setup_session()
 
         self.importer.run()
-        assert self._album().data_source == "match_source"
+        assert self._album().data_source == "MusicBrainz"
 
 
 class TestImportPretend(ImportHelper):

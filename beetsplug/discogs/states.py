@@ -130,9 +130,19 @@ class ArtistState:
         return [a.id for a in self.main_artists]
 
     @property
+    def discogs_artistids(self) -> list[str]:
+        """Return Discogs artist IDs for the main artists, preserving order."""
+        return self.artists_ids
+
+    @property
     def artist_id(self) -> str:
         """Return the primary Discogs artist ID."""
         return self.artists_ids[0]
+
+    @property
+    def discogs_artistid(self) -> str:
+        """Return the primary Discogs artist ID."""
+        return self.artist_id
 
     @property
     def artists(self) -> list[str]:

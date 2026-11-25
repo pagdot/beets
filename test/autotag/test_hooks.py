@@ -495,3 +495,71 @@ class TestAttrDictCachedPropertyMasking:
     def test_existing_dict_key_returns_value(self):
         obj = AttrDict[str]({"title": "ok"})
         assert obj.title == "ok"
+
+
+class TestNonMusicBrainzIds:
+    """Provider-specific identifiers from non-MusicBrainz sources must not
+    be published as MusicBrainz IDs (see #7164).
+    """
+
+    def _spotify_album(self, **kwargs) -> AlbumInfo:
+        return AlbumInfo(
+            tracks=[],
+            album="Album",
+            artist="Artist",
+            data_source="Spotify",
+            **kwargs,
+        )
+
+    def test_musicbrainz_ids_are_published(self):
+        info = AlbumInfo(
+            tracks=[],
+            album="Album",
+            artist="Artist",
+            album_id="7edb51cb-77d6-4416-a23c-3a8c2994a2c7",
+            artist_id="a6623d39-2d8e-4f70-8242-0a9553b91e50",
+            data_source="MusicBrainz",
+        )
+        data = info.item_data
+        assert data["mb_albumid"] == "7edb51cb-77d6-4416-a23c-3a8c2994a2c7"
+        assert data["mb_albumartistid"] == "a6623d39-2d8e-4f70-8242-0a9553b91e50"
+        assert "album_id" not in data
+
+    def test_non_musicbrainz_album_ids_are_not_published(self):
+        info = self._spotify_album(
+            album_id="1DkxJQouR8mZPVCIPkRsFq",
+            artist_id="4ZkpWTamfl5Ioq5mNpVkxW",
+            spotify_album_id="1DkxJQouR8mZPVCIPkRsFq",
+            spotify_artist_id="4ZkpWTamfl5Ioq5mNpVkxW",
+        )
+        data = info.item_data
+        assert "mb_albumid" not in data
+        assert "mb_albumartistid" not in data
+        assert "album_id" not in data
+        # The service-specific fields still carry the identifiers.
+        assert data["spotify_album_id"] == "1DkxJQouR8mZPVCIPkRsFq"
+        assert data["spotify_artist_id"] == "4ZkpWTamfl5Ioq5mNpVkxW"
+
+    def test_non_musicbrainz_track_ids_are_not_published(self):
+        info = self._spotify_album()
+        track = TrackInfo(
+            title="Track",
+            track_id="1by0LRd3Ej2g41heIxlT5B",
+            artist_id="4ZkpWTamfl5Ioq5mNpVkxW",
+            spotify_track_id="1by0LRd3Ej2g41heIxlT5B",
+            data_source="Spotify",
+        )
+        data = info.item_data | track.item_data
+        assert "mb_albumid" not in data
+        assert "mb_trackid" not in data
+        assert "mb_releasetrackid" not in data
+        assert "mb_artistid" not in data
+        assert data["spotify_track_id"] == "1by0LRd3Ej2g41heIxlT5B"
+
+    def test_musicbrainz_release_track_id_falls_back_to_track_id(self):
+        track = TrackInfo(
+            title="Track",
+            track_id="1by0LRd3Ej2g41heIxlT5B",
+            data_source="MusicBrainz",
+        )
+        assert track.item_data["mb_releasetrackid"] == "1by0LRd3Ej2g41heIxlT5B"

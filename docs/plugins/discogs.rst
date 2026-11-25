@@ -212,9 +212,9 @@ Contributor credits
 
 When Discogs provides artist roles on a track, beets uses them to separate main
 artists from other credited contributors. Main artist fields such as ``artist``,
-``artists``, ``artist_credit``, ``artists_credit``, ``artist_id``, and
-``artists_ids`` keep the primary artist credits, while featured artists from
-track roles are appended using :conf:`plugins.discogs:featured_string`.
+``artists``, ``artist_credit``, ``artists_credit``, ``discogs_artistid``, and
+``discogs_artistids`` keep the primary artist credits, while featured artists
+from track roles are appended using :conf:`plugins.discogs:featured_string`.
 
 Discogs contributor roles are also imported into beets' multi-value performer
 fields when available. This includes remixer, lyricist, composer, and arranger

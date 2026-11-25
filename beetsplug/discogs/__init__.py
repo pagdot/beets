@@ -225,7 +225,7 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
             return None
 
         track_info["artist"] = album_info.artist
-        track_info["artist_id"] = album_info.artist_id
+        track_info["discogs_artistid"] = album_info.discogs_artistid
         track_info["album"] = album_info.album
         return track_info
 
@@ -270,7 +270,7 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
     def track_for_id(self, track_id: str) -> TrackInfo | None:
         if album := self.album_for_id(track_id):
             for track in album.tracks:
-                if track.track_id == track_id:
+                if track.discogs_trackid == track_id:
                     return track
         return None
 
@@ -452,7 +452,7 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
             track.medium_total = mediums.count(track.medium)
             # Discogs does not have track IDs. Invent our own IDs as proposed
             # in #2336.
-            track.track_id = f"{album_id}-{track.track_alt}"
+            track.discogs_trackid = f"{album_id}-{track.track_alt}"
             track.data_url = data_url
             track.data_source = "Discogs"
 
@@ -469,7 +469,6 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
 
         return AlbumInfo(
             album=album,
-            album_id=album_id,
             **albumartist.info,  # Unpacks values to satisfy the keyword arguments
             tracks=tracks,
             albumtype=albumtype,
@@ -479,7 +478,7 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
             day=day,
             label=label,
             mediums=len(set(mediums)),
-            releasegroup_id=master_id,
+            discogs_masterid=master_id,
             catalognum=catalogno,
             country=country,
             style=(
@@ -494,7 +493,6 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
             data_url=data_url,
             discogs_albumid=discogs_albumid,
             discogs_labelid=labelid,
-            discogs_artistid=albumartist.artist_id,
             cover_art_url=cover_art_url,
         )
 
@@ -693,7 +691,6 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
             prefix = ", ".join(divisions)
             if prefix:
                 title = f"{prefix}: {title}"
-        track_id = None
         medium, medium_index, _ = self.get_track_index(track["position"])
 
         length = self.get_track_length(track["duration"])
@@ -709,7 +706,6 @@ class DiscogsPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
         return (
             TrackInfo(
                 title=title,
-                track_id=track_id,
                 **artistinfo.info,
                 length=length,
                 index=index,

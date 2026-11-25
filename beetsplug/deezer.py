@@ -31,6 +31,7 @@ class DeezerPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
     item_types: ClassVar[dict[str, types.Type]] = {
         "deezer_track_rank": types.INTEGER,
         "deezer_track_id": types.INTEGER,
+        "deezer_artist_id": types.INTEGER,
         "deezer_updated": types.DATE,
     }
     # Base URLs for the Deezer API
@@ -114,13 +115,13 @@ class DeezerPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
         for track in tracks:
             track.medium_total = medium_totals[track.medium]
 
-        album_artist_id = str(album_data["artist"]["id"])
+        album_artist_id = album_data["artist"]["id"]
         # Deezer assigns some compilations a single "main" artist instead of
         # the Various Artists entity, leaving them undetected. Treat a release
         # as VA when its album artist performs on fewer tracks than the
         # importer's own single-artist plurality threshold.
-        is_va = album_artist_id == str(VARIOUS_ARTISTS_ID) or (
-            sum(t.artist_id == album_artist_id for t in tracks)
+        is_va = album_artist_id == VARIOUS_ARTISTS_ID or (
+            sum(t.deezer_artist_id == album_artist_id for t in tracks)
             < len(tracks) * SINGLE_ARTIST_THRESH
         )
         if is_va:
@@ -129,13 +130,12 @@ class DeezerPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
 
         return AlbumInfo(
             album=album_data["title"],
-            album_id=deezer_id,
             deezer_album_id=deezer_id,
             artist=artist,
             artist_credit=(
                 artist if is_va else self.get_artist([album_data["artist"]])[0]
             ),
-            artist_id=str(artist_id),
+            deezer_artist_id=artist_id,
             tracks=tracks,
             albumtype=album_data["record_type"],
             va=is_va,
@@ -188,7 +188,7 @@ class DeezerPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
         for i, track_data in enumerate(album_tracks_data, start=1):
             if track_data["disk_number"] == track.medium:
                 medium_total += 1
-                if track_data["id"] == track.track_id:
+                if track_data["id"] == track.deezer_track_id:
                     track.index = i
         track.medium_total = medium_total
         return track
@@ -207,11 +207,10 @@ class DeezerPlugin(SearchApiMetadataSourcePlugin[IDResponse]):
             artist, artist_id = None, None
         return TrackInfo(
             title=track_data["title"],
-            track_id=track_data["id"],
             deezer_track_id=track_data["id"],
             isrc=track_data.get("isrc"),
             artist=artist,
-            artist_id=str(artist_id) if artist_id is not None else None,
+            deezer_artist_id=artist_id,
             length=track_data["duration"],
             index=track_data.get("track_position"),
             medium=track_data.get("disk_number"),

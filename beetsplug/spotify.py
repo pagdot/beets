@@ -395,13 +395,10 @@ class SpotifyPlugin(
 
         return AlbumInfo(
             album=album_data["name"],
-            album_id=spotify_id,
             spotify_album_id=spotify_id,
             artist=artist,
-            artist_id=artists_ids[0] if len(artists_ids) > 0 else None,
             spotify_artist_id=artists_ids[0] if len(artists_ids) > 0 else None,
             artists=artists_names,
-            artists_ids=artists_ids,
             tracks=tracks,
             albumtype=album_data["album_type"],
             va=len(album_data["artists"]) == 1
@@ -436,14 +433,11 @@ class SpotifyPlugin(
             album = None
         return TrackInfo(
             title=track_data["name"],
-            track_id=track_data["id"],
             spotify_track_id=track_data["id"],
             artist=artist,
             album=album,
-            artist_id=artists_ids[0] if len(artists_ids) > 0 else None,
             spotify_artist_id=artists_ids[0] if len(artists_ids) > 0 else None,
             artists=artists_names,
-            artists_ids=artists_ids,
             length=track_data["duration_ms"] / 1000,
             index=track_data["track_number"],
             medium=track_data["disc_number"],
@@ -483,7 +477,7 @@ class SpotifyPlugin(
         for i, track_data in enumerate(album_data["tracks"]["items"], start=1):
             if track_data["disc_number"] == track.medium:
                 medium_total += 1
-                if track_data["id"] == track.track_id:
+                if track_data["id"] == track.spotify_track_id:
                     track.index = i
         track.medium_total = medium_total
         return track

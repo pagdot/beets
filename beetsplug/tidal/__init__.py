@@ -400,8 +400,6 @@ class TidalPlugin(MetadataSourcePlugin):
         return AlbumInfo(
             # Identifier
             data_source=self.data_source,
-            album_id=album["id"],
-            artists_ids=artist_ids,
             data_url=self._parse_data_url(album["attributes"]),
             barcode=album["attributes"]["barcodeId"],
             cover_art_url=self._parse_artwork_url(album, artwork_by_id),
@@ -456,8 +454,6 @@ class TidalPlugin(MetadataSourcePlugin):
         return TrackInfo(
             # Identifier
             data_source=self.data_source,
-            track_id=track["id"],
-            artists_ids=artist_ids,
             data_url=self._parse_data_url(track["attributes"]),
             # Meta
             title=self._parse_title(track["attributes"]),

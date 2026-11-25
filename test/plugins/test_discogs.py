@@ -325,11 +325,11 @@ class TestStripDisambiguation(DiscogsTestMixin):
         """Test removing disambiguation from all disambiguated fields."""
         assert album_info.artist == "ARTIST NAME & OTHER ARTIST"
         assert album_info.artists == ["ARTIST NAME", "OTHER ARTIST"]
-        assert album_info.artists_ids == ["321", "322"]
+        assert album_info.discogs_artistids == ["321", "322"]
         assert album_info.tracks[0].artist == "TEST ARTIST"
         assert album_info.tracks[0].artists == ["TEST ARTIST"]
-        assert album_info.tracks[0].artist_id == "11146"
-        assert album_info.tracks[0].artists_ids == ["11146"]
+        assert album_info.tracks[0].discogs_artistid == "11146"
+        assert album_info.tracks[0].discogs_artistids == ["11146"]
         assert album_info.label == "LABEL NAME"
 
     @pytest.mark.parametrize("plugin_config", [{"strip_disambiguation": False}])
@@ -779,7 +779,7 @@ def test_anv_album_artist(config):
     assert r.artist == "ARTIST"
     assert r.artists == ["ARTIST"]
     assert r.artist_credit == "ARTIST"
-    assert r.artist_id == "321"
+    assert r.discogs_artistid == "321"
     assert r.artists_credit == ["ARTIST"]
     assert r.tracks[0].artist == "VARIATION"
     assert r.tracks[0].artists == ["VARIATION"]
@@ -820,7 +820,7 @@ def test_parse_featured_artists():
         "PERFORMER",
         "MUSICIAN",
     ]
-    assert t.artists_ids == ["11146", "344", "3", "5", "10"]
+    assert t.discogs_artistids == ["11146", "344", "3", "5", "10"]
     assert t.composers == ["RANDOM"]
 
 
@@ -878,9 +878,9 @@ def test_va_buildartistinfo(config):
     config["va_name"] = "VARIOUS ARTISTS"
     expected_info = {
         "artist": "VARIOUS ARTISTS",
-        "artist_id": "1",
+        "discogs_artistid": "1",
         "artists": ["VARIOUS ARTISTS"],
-        "artists_ids": ["1"],
+        "discogs_artistids": ["1"],
         "artist_credit": "VARIOUS ARTISTS",
         "artists_credit": ["VARIOUS ARTISTS"],
         "arrangers": None,
